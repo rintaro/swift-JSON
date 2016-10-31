@@ -118,20 +118,19 @@ struct PrinterImpl<NullType> {
     mutating func putEscaped(_ unit: UTF16.CodeUnit) {
         put(ascii8("\\")); 
         switch unit {
-        case ascii16("\\"),
-             ascii16("\""),
-             0x08, // \b
-             0x0C, // \f
-             0x0A, // \n
-             0x0D, // \r
-             0x09: // \t
-            put(UTF8.CodeUnit(unit))
+        case ascii16("\\"): put(ascii8("\\"))
+        case ascii16("\""): put(ascii8("\""))
+        case 0x08: put(ascii8("b")) // \b
+        case 0x0C: put(ascii8("f")) // \f
+        case 0x0A: put(ascii8("n")) // \n
+        case 0x0D: put(ascii8("r")) // \r
+        case 0x09: put(ascii8("t")) // \t
         default:
             put(ascii8("u"))
-            put(toHex(UTF8.CodeUnit(unit >> 0 & 0xF)))
-            put(toHex(UTF8.CodeUnit(unit >> 4 & 0xF)))
-            put(toHex(UTF8.CodeUnit(unit >> 8 & 0xF)))
             put(toHex(UTF8.CodeUnit(unit >> 12 & 0xF)))
+            put(toHex(UTF8.CodeUnit(unit >> 8 & 0xF)))
+            put(toHex(UTF8.CodeUnit(unit >> 4 & 0xF)))
+            put(toHex(UTF8.CodeUnit(unit >> 0 & 0xF)))
         }
     }
 
