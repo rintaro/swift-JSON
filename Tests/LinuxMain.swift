@@ -3,4 +3,5 @@ import XCTest
 
 XCTMain([
      testCase(JSONParsingTests.allTests),
+     testCase(JSONPrintingTests.allTests),
 ])
