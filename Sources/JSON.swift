@@ -8,15 +8,18 @@ struct JSON {
     let maxDepth: Int
     let indentShift: Int
     let spatial: Bool
+    let asciiOnly: Bool
 
     init(
       maxDepth: Int = MAX_DEPTH_DEFAULT,
       indentShift: Int = INDENT_SHIFT_OFF,
-      spatial: Bool = false
+      spatial: Bool = false,
+      asciiOnly: Bool = false
     ) {
         self.maxDepth = maxDepth
         self.indentShift = indentShift
         self.spatial = spatial
+        self.asciiOnly = asciiOnly
     }
 }
 
@@ -40,7 +43,8 @@ extension JSON {
         _ value: Any,
         maxDepth: Int = MAX_DEPTH_DEFAULT,
         indentShift: Int = INDENT_SHIFT_OFF,
-        spatial: Bool = false
+        spatial: Bool = false,
+        asciiOnly: Bool = false
     ) throws -> Data {
         var result = Data();
         let sink = { (chunk: UnsafeRawBufferPointer) -> Void in
@@ -53,7 +57,8 @@ extension JSON {
           null: NSNull(),
           maxDepth: maxDepth,
           indentShift: indentShift,
-          spatial: spatial
+          spatial: spatial,
+          asciiOnly: asciiOnly
         )
         try impl.printRoot();
         return result
@@ -72,7 +77,8 @@ extension JSON {
         return try JSON.encode(value,
             maxDepth: maxDepth,
             indentShift: indentShift,
-            spatial: spatial
+            spatial: spatial,
+            asciiOnly: asciiOnly
         )
     }
 }

@@ -34,7 +34,7 @@ struct PrinterImpl<NullType> {
     private let allowNumericKeyword: Bool = false
     private let indentShift: Int
     private let spatial: Bool
-    private let asciiOnly: Bool = false
+    private let asciiOnly: Bool
 
     init(
       root: Any,
@@ -42,7 +42,8 @@ struct PrinterImpl<NullType> {
       null: NullType,
       maxDepth: Int = 512,
       indentShift: Int = -1,
-      spatial: Bool = false
+      spatial: Bool = false,
+      asciiOnly: Bool = false
     ) {
       self.root = root
       self.sink = sink
@@ -51,6 +52,7 @@ struct PrinterImpl<NullType> {
       self.maxDepth = maxDepth
       self.indentShift = indentShift
       self.spatial = spatial
+      self.asciiOnly = asciiOnly
     }
 
     /// Flush internal buffer.
