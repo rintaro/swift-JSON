@@ -37,36 +37,36 @@ struct PrinterImpl<NullType> {
     private let asciiOnly: Bool
 
     init(
-      root: Any,
-      into sink: @escaping Sink,
-      null: NullType,
-      maxDepth: Int = 512,
-      indentShift: Int = -1,
-      spatial: Bool = false,
-      asciiOnly: Bool = false
+        root: Any,
+        into sink: @escaping Sink,
+        null: NullType,
+        maxDepth: Int = 512,
+        indentShift: Int = -1,
+        spatial: Bool = false,
+        asciiOnly: Bool = false
     ) {
-      self.root = root
-      self.sink = sink
-      self.buf = .allocate(count: BUF_SIZE)
-      self.bufIdx = buf.startIndex
-      self.maxDepth = maxDepth
-      self.indentShift = indentShift
-      self.spatial = spatial
-      self.asciiOnly = asciiOnly
+        self.root = root
+        self.sink = sink
+        self.buf = .allocate(count: BUF_SIZE)
+        self.bufIdx = buf.startIndex
+        self.maxDepth = maxDepth
+        self.indentShift = indentShift
+        self.spatial = spatial
+        self.asciiOnly = asciiOnly
     }
 
     /// Flush internal buffer.
     mutating func flush() {
-      sink(UnsafeRawBufferPointer(buf[buf.startIndex..<bufIdx as Range]))
-      bufIdx = buf.startIndex
+        sink(UnsafeRawBufferPointer(buf[buf.startIndex..<bufIdx as Range]))
+        bufIdx = buf.startIndex
     }
 
     mutating func put(_ chr: UTF8.CodeUnit) {
-      if bufIdx == buf.endIndex {
-        flush()
-      }
-      buf[bufIdx] = chr
-      bufIdx += 1
+        if bufIdx == buf.endIndex {
+            flush()
+        }
+        buf[bufIdx] = chr
+        bufIdx += 1
     }
 
     mutating func put<S : Sequence>(_ seq: S)
@@ -105,9 +105,9 @@ struct PrinterImpl<NullType> {
     }
 
     func toHex(_ x: UTF8.CodeUnit) -> UTF8.CodeUnit {
-      return x < 10
-        ? x + ascii8("0")
-        : x + (ascii8("A") - 10)
+        return x < 10
+            ? x + ascii8("0")
+            : x + (ascii8("A") - 10)
     }
 
     /// escaped:
@@ -290,9 +290,9 @@ struct PrinterImpl<NullType> {
         case .negativeInfinity,
             .positiveInfinity:
             if flt.sign == .minus {
-              try putNumericKeyword("-inf")
+                try putNumericKeyword("-inf")
             } else {
-              try putNumericKeyword("inf")
+                try putNumericKeyword("inf")
             }
         case .negativeZero, .positiveZero:
             put(ascii8("0"))
