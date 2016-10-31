@@ -211,9 +211,9 @@ private struct Lexer {
   mutating func lexString() throws -> Token {
     let start = ptr - 1
     while ptr != endPtr {
-      // Find 
+      // Find '"'.
       if ptr.pointee == ascii8("\"") {
-        // back track to validate this is NOT escaped '"'
+        // back track to validate this is NOT escaped '"'.
         var backtrack = ptr - 1
         var close = true
         while backtrack.pointee == ascii8("\\") {
@@ -250,7 +250,7 @@ private struct Lexer {
       throw createError(.invalidNumber, start)
     }
 
-    // Eat fraction part
+    // Eat fraction part....
     if ptr.pointee == ascii8(".") {
       ptr += 1
       let ptrAfterDot = ptr;
@@ -264,14 +264,14 @@ private struct Lexer {
       isInteger = false
     }
 
-    // Eat exponent part
+    // Eat exponent part.
     if ptr.pointee == ascii8("e") || ptr.pointee == ascii8("E") {
       ptr += 1
       if ptr == endPtr {
         throw createError(.invalidNumber, start)
       }
 
-      // Eat + or -
+      // Eat '+' or '-'
       if ptr.pointee == ascii8("+") || ptr.pointee == ascii8("-") {
         ptr += 1
       }
@@ -317,7 +317,7 @@ extension Lexer {
         return nil
       }
 
-      // Eat '\'
+      // Eat '\'.
       ptr += 1
 
       let c = UTF16.CodeUnit(ptr.pointee)
@@ -368,7 +368,7 @@ extension Lexer {
   }
 
   /// Iterator for unescaped characters.
-  /// Stops on '\' or the and
+  /// Stops on '\' or at the end.
   struct NormalCharacterIterator : IteratorProtocol {
     var ptr: Pointer
     let end: Pointer
@@ -501,7 +501,7 @@ struct ParserImpl<NullType> {
     return true;
   }
 
-  /// Parse single JSON value starting from the current token
+  /// Parse single JSON value starting from the current token.
   ///
   /// value:
   ///   object
