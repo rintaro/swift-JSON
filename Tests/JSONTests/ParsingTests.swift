@@ -157,7 +157,7 @@ class JSONParsingTests: XCTestCase {
     }
     
     func testError_EOF() {
-        try XCTAssertThrowsError(JSON.decode(data(""))) {
+        try XCTAssertThrowsError(JSON.decode(Data())) {
             let err = $0 as? JSONParsingError
             XCTAssertNotNil(err)
             XCTAssertEqual(err!.kind, .expectedValue)
@@ -200,9 +200,9 @@ class JSONParsingTests: XCTestCase {
             ("testString_unicodeEscape", testString_unicodeEscape),
             ("testObject_empty", testObject_empty),
             ("testObject_multiString", testObject_multiString),
-            ("testArray_empty", testObject_multiString),
-            ("testArray_multiString", testObject_multiString),
-            ("testUnicodeString", testObject_multiString),
+            ("testArray_empty", testArray_empty),
+            ("testArray_multiString", testArray_multiString),
+            ("testUnicodeString", testUnicodeString),
             
             ("testError_keyword", testError_keyword),
             ("testError_number", testError_number),

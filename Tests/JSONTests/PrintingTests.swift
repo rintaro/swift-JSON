@@ -66,7 +66,11 @@ class JSONPrintingTests: XCTestCase {
     }
 
     func testObject_multiString() throws {
-        try XCTAssertEqual(str(JSON.encode(["hello": "world", "swift": "rocks🐦"])), "{\"hello\":\"world\",\"swift\":\"rocks🐦\"}")
+        let result = try str(JSON.encode(["hello": "world", "swift": "rocks🐦"]))
+        XCTAssertTrue(
+           result == "{\"hello\":\"world\",\"swift\":\"rocks🐦\"}" ||
+           result == "{\"swift\":\"rocks🐦\",\"hello\":\"world\"}"
+        )
     }
 
     func testArray_empty() throws {
@@ -117,9 +121,9 @@ class JSONPrintingTests: XCTestCase {
             ("testString_unicodeEscape", testString_unicodeEscape),
             ("testObject_empty", testObject_empty),
             ("testObject_multiString", testObject_multiString),
-            ("testArray_empty", testObject_multiString),
-            ("testArray_multiString", testObject_multiString),
-            ("testUnicodeString", testObject_multiString),
+            ("testArray_empty", testArray_empty),
+            ("testArray_multiString", testArray_multiString),
+            ("testUnicodeString", testUnicodeString),
             
             ("testError_numericKeyword", testError_numericKeyword),
             ("testError_unknownValue", testError_unknownValue),
