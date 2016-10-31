@@ -591,10 +591,7 @@ struct ParserImpl<NullType> {
     depth += 1
     repeat {
       try ary.append(parseValue())
-      if try !consumeIf(.comma) {
-        break;
-      }
-    } while true
+    } while try consumeIf(.comma)
     depth -= 1
 
     if try !consumeIf(.r_square) {
