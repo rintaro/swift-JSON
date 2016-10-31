@@ -1,6 +1,6 @@
 
 public struct JSONParsingError : Error, CustomStringConvertible {
-    enum Kind {
+    public enum Kind {
         case unknownToken
         case unknownKeyword
         case unterminatedString
@@ -14,7 +14,7 @@ public struct JSONParsingError : Error, CustomStringConvertible {
         case expectedColon
         case expectedEOF
         
-        var description: String {
+        public var description: String {
             switch self {
             case .unknownToken: return "unknown token"
             case .unknownKeyword: return "unknown keyword"
@@ -32,9 +32,9 @@ public struct JSONParsingError : Error, CustomStringConvertible {
         }
     }
     
-    var kind: Kind
-    var line: Int
-    var column: Int
+    public let kind: Kind
+    public let line: Int
+    public let column: Int
 
     public var description: String {
         return "\(kind.description) at \(line):\(column)"

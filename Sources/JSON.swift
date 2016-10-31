@@ -4,7 +4,7 @@ var MAX_DEPTH_DEFAULT: Int { return 512 }
 var INDENT_SHIFT_OFF: Int { return -1 }
 
 /// JSON encoder/decoder
-struct JSON {
+public struct JSON {
     let maxDepth: Int
     let indentShift: Int
     let spatial: Bool
@@ -25,7 +25,7 @@ struct JSON {
 
 /// Static methods
 extension JSON {
-    static func decode(
+    public static func decode(
         _ data: Data,
         maxDepth: Int = MAX_DEPTH_DEFAULT
     ) throws -> Any {
@@ -39,7 +39,7 @@ extension JSON {
         }
     }
 
-    static func encode(
+    public static func encode(
         _ value: Any,
         maxDepth: Int = MAX_DEPTH_DEFAULT,
         indentShift: Int = INDENT_SHIFT_OFF,
@@ -67,13 +67,13 @@ extension JSON {
 
 /// Instance methods
 extension JSON {
-    func decode(_ data: Data) throws -> Any {
+    public func decode(_ data: Data) throws -> Any {
         return try JSON.decode(data,
             maxDepth: maxDepth
         )
     }
 
-    func encode(_ value: Any) throws -> Data {
+    public func encode(_ value: Any) throws -> Data {
         return try JSON.encode(value,
             maxDepth: maxDepth,
             indentShift: indentShift,
