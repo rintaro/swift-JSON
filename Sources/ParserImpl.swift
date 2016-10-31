@@ -21,7 +21,7 @@ public struct JSONParsingError : Error, CustomStringConvertible {
         case .unterminatedString: return "unterminated string"
         case .invalidString: return "invalid character in string"
         case .invalidNumber: return "invalid number"
-        case .unexpectedToken: return "unexpted token"
+        case .unexpectedToken: return "unexpected token"
         case .expectedString: return "expected string"
         case .expectedValue: return "expected value"
         case .expectedArrayClose: return "expected closing ']'"

@@ -3,7 +3,7 @@ import Foundation
 var MAX_DEPTH_DEFAULT: Int { return 512 }
 var INDENT_SHIFT_OFF: Int { return -1 }
 
-/// JSON Parser/Serializer
+/// JSON encoder/decoder
 struct JSON {
     let maxDepth: Int
     let indentShift: Int

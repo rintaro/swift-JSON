@@ -53,7 +53,7 @@ struct PrinterImpl<NullType> {
       self.spatial = spatial
     }
 
-    /// Flush internal buffer
+    /// Flush internal buffer.
     mutating func flush() {
       sink(UnsafeRawBufferPointer(buf[buf.startIndex..<bufIdx as Range]))
       bufIdx = buf.startIndex
@@ -74,13 +74,14 @@ struct PrinterImpl<NullType> {
         }
     }
 
-    /// Output given string
+    /// Output given string.
     mutating func put(_ str: String) {
         put(str.utf8)
     }
 
     /// space:
-    ///   ' '
+    ///   ' ' ; if spatial
+    ///       ; otherwise
     mutating func putSpace() {
         if spatial {
             put(ascii8(" "))
