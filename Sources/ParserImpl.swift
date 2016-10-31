@@ -339,7 +339,8 @@ extension Lexer {
       }
 
       if (end - ptr) < 4 {
-        return 0
+        hasError = true
+        return nil
       }
 
       let digit = ascii16("0")...ascii16("9")
