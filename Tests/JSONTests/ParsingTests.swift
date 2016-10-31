@@ -7,7 +7,7 @@ func data(_ str: String) -> Data {
 }
 
 class JSONParsingTests: XCTestCase {
-    func testPrimitive() throws {
+    func testKeyword() throws {
         try XCTAssertEqual(JSON.decode(data("null")) as? NSNull, NSNull())
         try XCTAssertEqual(JSON.decode(data("true")) as? Bool, true)
         try XCTAssertEqual(JSON.decode(data("false")) as? Bool, false)
@@ -76,9 +76,125 @@ class JSONParsingTests: XCTestCase {
         XCTAssertEqual(obj![1] as? String, "😢")
     }
 
+    func testError_keyword() {
+        try XCTAssertThrowsError(JSON.decode(data("nan"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err?.kind, .unknownKeyword)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("inf"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err?.kind, .unknownKeyword)
+        }
+    }
+    
+    func testError_number() {
+        try XCTAssertThrowsError(JSON.decode(data("01"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err?.kind, .invalidNumber)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("+12"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err?.kind, .unexpectedToken)
+        }
+    }
+    
+    func testError_string() {
+        try XCTAssertThrowsError(JSON.decode(data("\"abc"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .unterminatedString)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("\"\u{00}\""))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .invalidString)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("\"\\x\""))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .invalidString)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("\"\\u20\""))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .invalidString)
+        }
+    }
+    
+    func testError_object() {
+        try XCTAssertThrowsError(JSON.decode(data("{12: \"foo\"}"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedString)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("{\"foo\", 42}"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedColon)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("{\"foo\": 42"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedObjectClose)
+        }
+    }
+    
+    func testError_array() {
+        try XCTAssertThrowsError(JSON.decode(data("[\"foo\": 42]"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedArrayClose)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("[42, ]"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .unexpectedToken)
+        }
+    }
+    
+    func testError_EOF() {
+        try XCTAssertThrowsError(JSON.decode(data(""))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedValue)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("[1,2"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedArrayClose)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("{\"foo\""))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedColon)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("{\"foo\":"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedValue)
+        }
+        try XCTAssertThrowsError(JSON.decode(data("{\"foo\": 42"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedObjectClose)
+        }
+    }
+    
+    func testError_trailingGabage() {
+        try XCTAssertThrowsError(JSON.decode(data("{\"foo\": 42}, 12"))) {
+            let err = $0 as? JSONParsingError
+            XCTAssertNotNil(err)
+            XCTAssertEqual(err!.kind, .expectedEOF)
+        }
+    }
+
     static var allTests : [(String, (JSONParsingTests) -> () throws -> Void)] {
         return [
-            ("testKeyword", testPrimitive),
+            ("testKeyword", testKeyword),
             ("testNumber", testNumber),
             ("testString_simpleEscape", testString_simpleEscape),
             ("testString_unicodeEscape", testString_unicodeEscape),
@@ -87,6 +203,14 @@ class JSONParsingTests: XCTestCase {
             ("testArray_empty", testObject_multiString),
             ("testArray_multiString", testObject_multiString),
             ("testUnicodeString", testObject_multiString),
+            
+            ("testError_keyword", testError_keyword),
+            ("testError_number", testError_number),
+            ("testError_string", testError_string),
+            ("testError_object", testError_object),
+            ("testError_array", testError_array),
+            ("testError_EOF", testError_EOF),
+            ("testError_trailingGabage", testError_trailingGabage),
         ]
     }
 }
