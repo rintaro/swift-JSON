@@ -74,14 +74,6 @@ private struct Token {
     }
 }
 
-func ascii16(_ x: UnicodeScalar) -> UTF16.CodeUnit {
-    return UTF16.CodeUnit(truncatingBitPattern: x.value)
-}
-
-func ascii8(_ x: UnicodeScalar) -> UTF8.CodeUnit {
-    return UTF8.CodeUnit(truncatingBitPattern: x.value)
-}
-
 /// Lexer implementation
 private struct Lexer {
     
