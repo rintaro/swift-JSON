@@ -114,7 +114,7 @@ class JSONParsingTests: XCTestCase {
             XCTAssertNotNil(err)
             XCTAssertEqual(err!.kind, .unterminatedString)
         }
-        try XCTAssertThrowsError(JSON.decode(data("\"\u{00}\""))) {
+        try XCTAssertThrowsError(JSON.decode(data("[\"\u{00}\"]"))) {
             let err = $0 as? JSONParsingError
             XCTAssertNotNil(err)
             XCTAssertEqual(err!.kind, .invalidString)
