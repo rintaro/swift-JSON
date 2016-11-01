@@ -190,7 +190,7 @@ class JSONParsingTests: XCTestCase {
         }
     }
     
-    func testError_trailingGabage() {
+    func testError_trailingGarbage() {
         try XCTAssertThrowsError(JSON.decode(data("{\"foo\": 42}, 12"))) {
             let err = $0 as? JSONParsingError
             XCTAssertNotNil(err)
@@ -240,7 +240,7 @@ class JSONParsingTests: XCTestCase {
             ("testError_object", testError_object),
             ("testError_array", testError_array),
             ("testError_EOF", testError_EOF),
-            ("testError_trailingGabage", testError_trailingGabage),
+            ("testError_trailingGarbage", testError_trailingGarbage),
             ("testJSONTestSuite", testJSONTestSuite),
         ]
     }
