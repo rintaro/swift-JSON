@@ -6,6 +6,37 @@ func data(_ str: String) -> Data {
   return str.data(using: .utf8)!
 }
 
+/// Helper function that assert given two objects are approximately equals.
+func JSONTestAssertValueEqual(_ val1: Any, _ val2: Any) {
+  switch (val1, val2) {
+    case let (d1, d2) as ([String: Any], [String: Any]):
+        XCTAssertEqual(d1.count, d2.count)
+        for k in d1.keys {
+          XCTAssertNotNil(d1[k])
+          XCTAssertNotNil(d2[k])
+          JSONTestAssertValueEqual(d1[k]!, d2[k]!)
+        }
+    case let (a1, a2) as ([Any], [Any]):
+        XCTAssertEqual(a1.count, a2.count)
+        for i in 0 ..< a1.count {
+          JSONTestAssertValueEqual(a1[i], a2[i])
+        }
+    case let (s1, s2) as (String, String):
+        XCTAssertEqual(s1, s2)
+    case let (i1, i2) as (Int, Int):
+        XCTAssertEqual(i1, i2)
+    case let (f1, f2) as (Double, Double):
+        // decode -> encode -> decode may result different value.
+        XCTAssertEqual("\(f1)", "\(f2)")
+    case let (b1, b2) as (Bool, Bool):
+        XCTAssertEqual(b1, b2)
+    case is (NSNull, NSNull):
+        break
+    default:
+        XCTFail("not equal")
+  }
+}
+
 class JSONParsingTests: XCTestCase {
     func testKeyword() throws {
         try XCTAssertEqual(JSON.decode(data("null")) as? NSNull, NSNull())
@@ -198,6 +229,23 @@ class JSONParsingTests: XCTestCase {
         }
     }
 
+    func testSampleJson() {
+        let url = URL(fileURLWithPath: #file)
+            .deletingLastPathComponent()
+            .appendingPathComponent("Inputs", isDirectory: true)
+            .appendingPathComponent("json-test-suite", isDirectory: true)
+            .appendingPathComponent("sample.json", isDirectory: false)
+
+        // Ensure we can decode -> encode -> decode, and each results are
+        // approximately equals.
+        let dat1 = try! Data(contentsOf: url)
+        let val1 = try! JSON.decode(dat1)
+        let dat2 = try! JSON.encode(val1)
+        let val2 = try! JSON.decode(dat2)
+
+        JSONTestAssertValueEqual(val1, val2)
+    }
+
     func testJSONTestSuite() {
         let path = URL(fileURLWithPath: #file)
             .deletingLastPathComponent()
@@ -247,6 +295,8 @@ class JSONParsingTests: XCTestCase {
             ("testError_array", testError_array),
             ("testError_EOF", testError_EOF),
             ("testError_trailingGarbage", testError_trailingGarbage),
+
+            ("testSampleJson", testSampleJson),
             ("testJSONTestSuite", testJSONTestSuite),
         ]
     }
