@@ -422,42 +422,35 @@ extension Lexer {
         }
         return ret
     }
+    
+    private static func withMakingCString<T>(_ range: Token.Range, fn: (UnsafePointer<Int8>) -> T) throws -> T {
+        let tmpBuf = UnsafeMutablePointer<Int8>.allocate(capacity: range.count + 1)
+        defer { tmpBuf.deallocate(capacity: range.count + 1) }
+        range.lowerBound.withMemoryRebound(to: Int8.self, capacity: range.count) {
+            tmpBuf.assign(from: $0, count: range.count)
+        }
+        tmpBuf[range.count] = 0 // NUL terminate
+        
+        errno = 0
+        let result = fn(tmpBuf)
+        guard errno == 0 || errno == ERANGE else {
+            throw GetValueAbort()
+        }
+        return result
+    }
 
     /// Get real value of the real number literal token.
     static func getRealValue(_ range: Token.Range) throws -> Double {
-        return try range.lowerBound.withMemoryRebound(to: Int8.self, capacity: range.count) {
-          var tmpBuf = Array<Int8>()
-          tmpBuf.reserveCapacity(range.count + 1)
-          tmpBuf.append(contentsOf: UnsafeBufferPointer(start: $0, count: range.count))
-          tmpBuf.append(0)
-
-          // Use strtod instead of Double.init(_:String) because the latter returns
-          // `nil` for out of range values
-          errno = 0
-          let result = strtod(tmpBuf, nil)
-          guard errno == 0 || errno == ERANGE else {
-            throw GetValueAbort()
-          }
-          return result
-        }
+        // Use strtod instead of Double.init(_:String) because the latter returns
+        // `nil` for out of range values
+        return try withMakingCString(range) { strtod($0, nil) }
     }
 
     /// Get integer value of the integer number literal token.
     static func getIntegerValue(_ range: Token.Range) throws -> Int {
-        return try range.lowerBound.withMemoryRebound(to: Int8.self, capacity: range.count) {
-          var tmpBuf = Array<Int8>()
-          tmpBuf.reserveCapacity(range.count + 1)
-          tmpBuf.append(contentsOf: UnsafeBufferPointer(start: $0, count: range.count))
-          tmpBuf.append(0)
-          // Use strtol instead of Int.init(_:String) because the latter returns
-          // `nil` for out of range values
-          errno = 0
-          let result = strtol(tmpBuf, nil, 10)
-          guard errno == 0 || errno == ERANGE else {
-            throw GetValueAbort()
-          }
-          return result
-        }
+        // Use strtol instead of Double.init(_:String) because the latter returns
+        // `nil` for out of range values
+        return try withMakingCString(range) { strtol($0, nil, 10) }
     }
 }
 
