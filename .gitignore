@@ -4,6 +4,7 @@
 
 *.pbxuser
 xcuserdata/
+project.xcworkspace/
 
 Carthage/Build
 Carthage/Checkouts
