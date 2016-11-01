@@ -1,3 +1,8 @@
+#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+  import Darwin
+#elseif os(Linux) || os(FreeBSD) || os(Android)
+  import Glibc
+#endif
 
 public struct JSONParsingError : Error, CustomStringConvertible {
     public enum Kind {
@@ -231,19 +236,21 @@ private struct Lexer {
     mutating func lexNumber() throws -> Token {
         let start = ptr-1
         let digit = ascii8("0")...ascii8("9")
-        
+
         while ptr != endPtr && digit ~= ptr.pointee {
             ptr += 1
         }
         
         var isInteger = true
         
-        // Minus sign without integer part.
-        if ptr - start == 1 && start.pointee == ascii8("-") {
-            throw createError(.invalidNumber, start)
-        }
-        // Number cannot start with zero.
-        if ptr - start != 1 && start.pointee == ascii8("0") {
+        if (
+            // '-'; Minus sign without integer part.
+            ptr - start == 1 && start.pointee == ascii8("-") ||
+            // '0' DIGIT*N; Number cannot start with zero.
+            ptr - start > 1 && start.pointee == ascii8("0") ||
+            // '-0' DIGIT*N;
+            ptr - start > 2 && start.pointee == ascii8("-") && (start+1).pointee == ascii8("0") 
+        ) {
             throw createError(.invalidNumber, start)
         }
         
@@ -430,28 +437,39 @@ extension Lexer {
 
     /// Get real value of the real number literal token.
     static func getRealValue(_ range: Token.Range) throws -> Double {
-        var tmpBuf = Array<UTF8.CodeUnit>()
-        tmpBuf.reserveCapacity(range.count + 1)
-        tmpBuf.append(contentsOf: UnsafeBufferPointer(start: range.lowerBound, count: range.count))
-        tmpBuf.append(0)
-        
-        guard let ret = Double(String(cString: tmpBuf)) else {
+        return try range.lowerBound.withMemoryRebound(to: Int8.self, capacity: range.count) {
+          var tmpBuf = Array<Int8>()
+          tmpBuf.reserveCapacity(range.count + 1)
+          tmpBuf.append(contentsOf: UnsafeBufferPointer(start: $0, count: range.count))
+          tmpBuf.append(0)
+
+          // Use strtod instead of Double.init(_:String) because the latter returns
+          // `nil` for out of range values
+          errno = 0
+          let result = strtod(tmpBuf, nil)
+          guard errno == 0 || errno == ERANGE else {
             throw GetValueAbort()
+          }
+          return result
         }
-        return ret
     }
 
     /// Get integer value of the integer number literal token.
     static func getIntegerValue(_ range: Token.Range) throws -> Int {
-        var tmpBuf = Array<UTF8.CodeUnit>()
-        tmpBuf.reserveCapacity(range.count + 1)
-        tmpBuf.append(contentsOf: UnsafeBufferPointer(start: range.lowerBound, count: range.count))
-        tmpBuf.append(0)
-        
-        guard let ret = Int(String(cString: tmpBuf)) else {
+        return try range.lowerBound.withMemoryRebound(to: Int8.self, capacity: range.count) {
+          var tmpBuf = Array<Int8>()
+          tmpBuf.reserveCapacity(range.count + 1)
+          tmpBuf.append(contentsOf: UnsafeBufferPointer(start: $0, count: range.count))
+          tmpBuf.append(0)
+          // Use strtol instead of Int.init(_:String) because the latter returns
+          // `nil` for out of range values
+          errno = 0
+          let result = strtol(tmpBuf, nil, 10)
+          guard errno == 0 || errno == ERANGE else {
             throw GetValueAbort()
+          }
+          return result
         }
-        return ret
     }
 }
 

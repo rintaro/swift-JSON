@@ -22,6 +22,12 @@ class JSONParsingTests: XCTestCase {
         try XCTAssertEqual(JSON.decode(data("1e3")) as? Double, 1000)
         try XCTAssertEqual(JSON.decode(data("1e+3")) as? Double, 1000)
         try XCTAssertEqual(JSON.decode(data("1e-3")) as? Double, 0.001)
+
+        try XCTAssertEqual(JSON.decode(data("100000000000000000000000000000")) as? Int, Int.max)
+        try XCTAssertEqual(JSON.decode(data("-100000000000000000000000000000")) as? Int, Int.min)
+
+        try XCTAssertEqual(JSON.decode(data("1e+999999")) as? Double, Double.infinity)
+        try XCTAssertEqual(JSON.decode(data("1e-999999")) as? Double, 0)
     }
 
     func testString_simpleEscape() throws {
@@ -192,6 +198,30 @@ class JSONParsingTests: XCTestCase {
         }
     }
 
+    func testJSONTestSuite() {
+        let path = URL(fileURLWithPath: #file)
+            .deletingLastPathComponent()
+            .appendingPathComponent("Inputs", isDirectory: true)
+            .appendingPathComponent("test_parsing", isDirectory: true)
+        let urls = try! FileManager.default
+            .contentsOfDirectory(at: path,
+                                 includingPropertiesForKeys: nil,
+                                 options: [])
+        for url in urls where url.pathExtension == "json" {
+            let basename = url.lastPathComponent
+            let dat = try! Data(contentsOf: url)
+            if basename.hasPrefix("y_") {
+                XCTAssertNotNil(try JSON.decode(dat),
+                                "\(basename) must be accepted")
+            } else if basename.hasPrefix("n_") {
+                XCTAssertThrowsError(try JSON.decode(dat),
+                                     "\(basename) must be rejected")
+            } else {
+                _ = try? JSON.decode(dat)
+            }
+        }
+    }
+
     static var allTests : [(String, (JSONParsingTests) -> () throws -> Void)] {
         return [
             ("testKeyword", testKeyword),
@@ -211,6 +241,7 @@ class JSONParsingTests: XCTestCase {
             ("testError_array", testError_array),
             ("testError_EOF", testError_EOF),
             ("testError_trailingGabage", testError_trailingGabage),
+            ("testJSONTestSuite", testJSONTestSuite),
         ]
     }
 }
