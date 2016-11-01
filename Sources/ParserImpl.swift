@@ -13,6 +13,7 @@ public struct JSONParsingError : Error, CustomStringConvertible {
         case expectedObjectClose
         case expectedColon
         case expectedEOF
+        case maxDepthExceeded
         
         public var description: String {
             switch self {
@@ -28,6 +29,7 @@ public struct JSONParsingError : Error, CustomStringConvertible {
             case .expectedObjectClose: return "expected closing '}'"
             case .expectedColon: return "expected ':'"
             case .expectedEOF: return "expected EOF"
+            case .maxDepthExceeded: return "max depth exceeded"
             }
         }
     }
@@ -541,11 +543,15 @@ struct ParserImpl<NullType> {
     ///   '{' (string ':' value)* '}'
     private mutating func parseObject() throws -> Any {
         try consumeToken(.l_brace)
-        
+
         var obj: [String: Any] = [:]
         
         if try consumeIf(.r_brace) {
             return obj
+        }
+        
+        if depth >= maxDepth {
+          throw lexer.createError(.maxDepthExceeded, token.loc)
         }
         
         depth += 1
@@ -581,6 +587,10 @@ struct ParserImpl<NullType> {
         // Short circuit
         if try consumeIf(.r_square) {
             return ary
+        }
+
+        if depth >= maxDepth {
+          throw lexer.createError(.maxDepthExceeded, token.loc)
         }
         
         depth += 1
