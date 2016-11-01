@@ -126,7 +126,7 @@ private func ensuringUTF8(_ data: Data, _ impl: (UnsafePointer<UInt8>, Int) thro
         if encoding != .utf8 {
             // NOTE: This is very slow operation.
             // But we want to assume UTF16/UTF32 JSON are not commonly used.
-            let buf = UnsafeBufferPointer(start: ptr, count: data.count - skipped)
+            let buf = UnsafeBufferPointer(start: ptr + skipped, count: data.count - skipped)
             let str = String(bytes: buf, encoding: encoding)
             let converted = str?.data(using: .utf8) ?? Data()
             return try converted.withUnsafeBytes { (ptr: UnsafePointer<UInt8>) -> Any in

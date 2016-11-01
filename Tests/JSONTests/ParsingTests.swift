@@ -207,17 +207,22 @@ class JSONParsingTests: XCTestCase {
             .contentsOfDirectory(at: path,
                                  includingPropertiesForKeys: nil,
                                  options: [])
+
         for url in urls where url.pathExtension == "json" {
             let basename = url.lastPathComponent
             let dat = try! Data(contentsOf: url)
-            if basename.hasPrefix("y_") {
-                XCTAssertNotNil(try JSON.decode(dat),
-                                "\(basename) must be accepted")
-            } else if basename.hasPrefix("n_") {
-                XCTAssertThrowsError(try JSON.decode(dat),
-                                     "\(basename) must be rejected")
+            let obj = try? JSON.decode(dat)
+
+            if let obj = obj {
+              print("JSONTestSuite: accepted \(basename) -> \(type(of:obj))")
             } else {
-                _ = try? JSON.decode(dat)
+              print("JSONTestSuite: rejected \(basename)")
+            }
+
+            if basename.hasPrefix("y_") {
+                XCTAssertNotNil(obj, "\(basename) must be accepted")
+            } else if basename.hasPrefix("n_") {
+                XCTAssertNil(obj, "\(basename) must be rejected")
             }
         }
     }
