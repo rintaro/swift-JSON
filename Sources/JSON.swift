@@ -11,10 +11,10 @@ public struct JSON {
     let asciiOnly: Bool
 
     init(
-      maxDepth: Int = MAX_DEPTH_DEFAULT,
-      indentShift: Int = INDENT_SHIFT_OFF,
-      spatial: Bool = false,
-      asciiOnly: Bool = false
+        maxDepth: Int = MAX_DEPTH_DEFAULT,
+        indentShift: Int = INDENT_SHIFT_OFF,
+        spatial: Bool = false,
+        asciiOnly: Bool = false
     ) {
         self.maxDepth = maxDepth
         self.indentShift = indentShift
@@ -48,8 +48,9 @@ extension JSON {
     ) throws -> Data {
         var result = Data();
         let sink = { (chunk: UnsafeRawBufferPointer) -> Void in
-          let chunkStart = chunk.baseAddress!.assumingMemoryBound(to: UInt8.self)
-          result.append(UnsafeBufferPointer(start: chunkStart, count: chunk.count))
+          result.append(
+              chunk.baseAddress!.bindMemory(to: UInt8.self, capacity: chunk.count),
+              count: chunk.count)
         }
         var impl = PrinterImpl(
           root: value,

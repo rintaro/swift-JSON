@@ -1,4 +1,4 @@
-var BUF_SIZE: Int { return 1024 }
+var BUF_SIZE: Int { return 255 }
 
 public enum JSONPrintingError : Error, CustomStringConvertible {
     case invalidNumericValue(String)
@@ -47,7 +47,7 @@ struct PrinterImpl<NullType> {
     ) {
         self.root = root
         self.sink = sink
-        self.buf = .allocate(count: BUF_SIZE)
+        self.buf = UnsafeMutableRawBufferPointer(start: nil, count: 0)
         self.bufIdx = buf.startIndex
         self.maxDepth = maxDepth
         self.indentShift = indentShift
@@ -353,6 +353,9 @@ struct PrinterImpl<NullType> {
     }
 
     mutating func printRoot() throws {
+        buf = .allocate(count: BUF_SIZE)
+        bufIdx = buf.startIndex
+        defer { buf.deallocate() }
         try visit(root)
         if indentShift >= 0 {
             putNewLine()
