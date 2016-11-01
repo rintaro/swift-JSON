@@ -12,7 +12,7 @@ import PackageDescription
 let package = Package(
     name: "hello",
     dependencies: [
-        .Package(url: "https://github.com/rintaro/Swift-JSON.git", majorVersion: 0, minor: 1),
+        .Package(url: "https://github.com/rintaro/Swift-JSON.git", majorVersion: 0, minor: 2),
     ]
 )
 ```
@@ -20,7 +20,7 @@ let package = Package(
 #### Carthage
 
 ```
-github "rintaro/swift-JSON" ~> 0.1
+github "rintaro/swift-JSON" ~> 0.2
 ```
 
 ## Using JSON
