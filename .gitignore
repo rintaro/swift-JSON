@@ -1,4 +1,9 @@
 .DS_Store
 /.build
 /Packages
-/*.xcodeproj
+
+*.pbxuser
+xcuserdata/
+
+Carthage/Build
+Carthage/Checkouts

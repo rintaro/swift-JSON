@@ -17,6 +17,14 @@ let package = Package(
 )
 ```
 
+#### Carthage
+
+Cartfile
+
+```
+github "rintaro/swift-JSON" ~> 0.1
+```
+
 ## Using JSON
 
 Via static methods.
