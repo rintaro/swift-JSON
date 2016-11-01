@@ -106,8 +106,8 @@ struct PrinterImpl<NullType> {
 
     func toHex(_ x: UTF8.CodeUnit) -> UTF8.CodeUnit {
         return x < 10
-            ? x + ascii8("0")
-            : x + (ascii8("A") - 10)
+            ? x &+ ascii8("0")
+            : x &+ (ascii8("A") - 10)
     }
 
     /// escaped:
@@ -129,10 +129,10 @@ struct PrinterImpl<NullType> {
         case 0x09: put(ascii8("t")) // \t
         default:
             put(ascii8("u"))
-            put(toHex(UTF8.CodeUnit(unit >> 12 & 0xF)))
-            put(toHex(UTF8.CodeUnit(unit >> 8 & 0xF)))
-            put(toHex(UTF8.CodeUnit(unit >> 4 & 0xF)))
-            put(toHex(UTF8.CodeUnit(unit >> 0 & 0xF)))
+            put(toHex(UTF8.CodeUnit(truncatingBitPattern: unit >> 12 & 0xF)))
+            put(toHex(UTF8.CodeUnit(truncatingBitPattern: unit >> 8 & 0xF)))
+            put(toHex(UTF8.CodeUnit(truncatingBitPattern: unit >> 4 & 0xF)))
+            put(toHex(UTF8.CodeUnit(truncatingBitPattern: unit >> 0 & 0xF)))
         }
     }
 
