@@ -357,7 +357,7 @@ extension Lexer {
                     hasError = true;
                     return nil
                 }
-                result = (result << 4) + n
+                result = (result << 4) &+ n
                 ptr += 1
             }
             return result;
