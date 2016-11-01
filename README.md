@@ -19,39 +19,53 @@ let package = Package(
 
 #### Carthage
 
-Cartfile
-
 ```
 github "rintaro/swift-JSON" ~> 0.1
 ```
 
 ## Using JSON
 
-Via static methods.
+#### decode 
+
+(a.k.a. parse or deserialize)
 
 ```swift
 import JSON
 
-func foo(data: Data) throws -> Data? {
-    let objAny = try JSON.decode(jsonData)
-    return try JSON.encode(objAny)
+let jsonData: Data = ...
+
+do {
+
+    let value = try JSON.decode(jsonData)
+    // do something...
+
+} catch let e as JSONParsingError {
+    print(e)
 }
+
 ```
 
-Via instance methods.
+#### encode 
+
+(a.k.a. dump or serialize)
 
 ```swift
 import JSON
 
-func foo(data: Data) throws -> Data? {
-    let json = JSON()
+let value: Any = ...
 
-    let objAny = json.decode(jsonData)
-    return try json.encode(objAny)
+do {
+
+    let data = try JSON.encode(value)
+    // do something...
+
+} catch let e as JSONPrintingError {
+    print(e)
 }
+
 ```
 
 ## Requirements
 
-* Swift 3.0.1
+* Swift 3.0.1 (Xcode8.1 on macOS)
 * Foundation
