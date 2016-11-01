@@ -177,33 +177,22 @@ private struct Lexer {
     /// Tokenize a keyword.
     mutating func lexKeyword() throws -> Token {
         let start = ptr - 1
-        // true
-        if start.pointee == ascii8("t") &&
-            endPtr - ptr >= 3 &&
-            (ptr + 0).pointee == ascii8("r") &&
-            (ptr + 1).pointee == ascii8("u") &&
-            (ptr + 2).pointee == ascii8("e") {
-            ptr += 3
-            return createToken(.true_, start)
-        }
-        // false
-        if start.pointee == ascii8("f") &&
-            endPtr - ptr >= 4 &&
-            (ptr + 0).pointee == ascii8("a") &&
-            (ptr + 1).pointee == ascii8("l") &&
-            (ptr + 2).pointee == ascii8("s") &&
-            (ptr + 3).pointee == ascii8("e") {
-            ptr += 4
-            return createToken(.false_, start)
-        }
-        // null
-        if start.pointee == ascii8("n") &&
-            endPtr - ptr >= 3 &&
-            (ptr + 0).pointee == ascii8("u") &&
-            (ptr + 1).pointee == ascii8("l") &&
-            (ptr + 2).pointee == ascii8("l") {
-            ptr += 3
-            return createToken(.null, start)
+        if endPtr - ptr >= 3 {
+            switch (ptr[-1], ptr[0], ptr[1], ptr[2]) {
+            case (ascii8("n"), ascii8("u"), ascii8("l"), ascii8("l")): // null
+                ptr += 3
+                return createToken(.null, start)
+            case (ascii8("t"), ascii8("r"), ascii8("u"), ascii8("e")): // true
+                ptr += 3
+                return createToken(.true_, start)
+            case (ascii8("f"), ascii8("a"), ascii8("l"), ascii8("s")): // false
+                if endPtr - ptr >= 4 && ptr[3] == ascii8("e"){
+                    ptr += 4
+                    return createToken(.false_, start)
+                }
+            default:
+                break
+            }
         }
         
         throw createError(.unknownKeyword, start)
@@ -354,17 +343,16 @@ extension Lexer {
             var result: UTF16.CodeUnit = 0
             let term = ptr + 4
             while ptr != term {
-                let c = UTF16.CodeUnit(ptr.pointee)
-                let n: UTF16.CodeUnit
+                var c = UTF16.CodeUnit(ptr.pointee)
                 switch c {
-                case digit: n = UTF16.CodeUnit(c) &- digit.lowerBound
-                case lower: n = UTF16.CodeUnit(c) &- lower.lowerBound &+ 10
-                case upper: n = UTF16.CodeUnit(c) &- upper.lowerBound &+ 10
+                case digit: c = c &- digit.lowerBound
+                case lower: c = c &- lower.lowerBound &+ 10
+                case upper: c = c &- upper.lowerBound &+ 10
                 default:
                     hasError = true;
                     return nil
                 }
-                result = (result << 4) &+ n
+                result = (result << 4) &+ c
                 ptr += 1
             }
             return result;
@@ -387,7 +375,7 @@ extension Lexer {
                 return nil
             }
             let result = UTF8.CodeUnit(ptr.pointee)
-            if 0x00...0x19 ~= result {
+            if 0x00..<0x20 ~= result {
                 hasError = true;
                 return nil
             }
