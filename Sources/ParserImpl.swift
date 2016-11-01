@@ -348,9 +348,9 @@ extension Lexer {
                 let c = UTF16.CodeUnit(ptr.pointee)
                 let n: UTF16.CodeUnit
                 switch c {
-                case digit: n = UTF16.CodeUnit(c) - digit.lowerBound
-                case lower: n = UTF16.CodeUnit(c) - lower.lowerBound + 10
-                case upper: n = UTF16.CodeUnit(c) - upper.lowerBound + 10
+                case digit: n = UTF16.CodeUnit(c) &- digit.lowerBound
+                case lower: n = UTF16.CodeUnit(c) &- (lower.lowerBound + 10)
+                case upper: n = UTF16.CodeUnit(c) &- (upper.lowerBound + 10)
                 default:
                     hasError = true;
                     return nil

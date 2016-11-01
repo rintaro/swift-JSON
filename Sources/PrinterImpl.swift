@@ -66,7 +66,7 @@ struct PrinterImpl<NullType> {
             flush()
         }
         buf[bufIdx] = chr
-        bufIdx += 1
+        bufIdx = bufIdx &+ 1
     }
 
     mutating func put<S : Sequence>(_ seq: S)
