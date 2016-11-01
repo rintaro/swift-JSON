@@ -202,6 +202,7 @@ class JSONParsingTests: XCTestCase {
         let path = URL(fileURLWithPath: #file)
             .deletingLastPathComponent()
             .appendingPathComponent("Inputs", isDirectory: true)
+            .appendingPathComponent("JSONTestSuite", isDirectory: true)
             .appendingPathComponent("test_parsing", isDirectory: true)
         let urls = try! FileManager.default
             .contentsOfDirectory(at: path,
