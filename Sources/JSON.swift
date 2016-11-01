@@ -133,6 +133,6 @@ private func ensuringUTF8(_ data: Data, _ impl: (UnsafePointer<UInt8>, Int) thro
                 try impl(ptr, converted.count)
             }
         }
-        return try impl(ptr, data.count &- skipped)
+        return try impl(ptr + skipped, data.count &- skipped)
     }
 }
