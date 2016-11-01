@@ -424,8 +424,8 @@ extension Lexer {
     }
     
     private static func withMakingCString<T>(_ range: Token.Range, fn: (UnsafePointer<Int8>) -> T) throws -> T {
-        let tmpBuf = UnsafeMutablePointer<Int8>.allocate(capacity: range.count + 1)
-        defer { tmpBuf.deallocate(capacity: range.count + 1) }
+        let tmpBuf = UnsafeMutablePointer<Int8>.allocate(capacity: range.count &+ 1)
+        defer { tmpBuf.deallocate(capacity: range.count &+ 1) }
         range.lowerBound.withMemoryRebound(to: Int8.self, capacity: range.count) {
             tmpBuf.assign(from: $0, count: range.count)
         }
