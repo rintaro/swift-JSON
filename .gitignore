@@ -8,3 +8,4 @@ project.xcworkspace/
 
 Carthage/Build
 Carthage/Checkouts
+/build
