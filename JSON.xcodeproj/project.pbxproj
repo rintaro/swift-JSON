@@ -150,7 +150,7 @@
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -158,7 +158,6 @@
 				OBJ_13 /* Tests */,
 				OBJ_17 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_7 /* Sources */ = {
@@ -312,7 +311,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_17 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -706,7 +705,7 @@
 				0C3BD91B1DC897570012C94D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 		0C3BD9251DC897610012C94D /* Build configuration list for PBXNativeTarget "JSON-tvOS" */ = {
 			isa = XCConfigurationList;
@@ -715,7 +714,7 @@
 				0C3BD9271DC897610012C94D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 		0C3BD9331DC89BC40012C94D /* Build configuration list for PBXNativeTarget "JSON-iOSTests" */ = {
 			isa = XCConfigurationList;
@@ -724,7 +723,7 @@
 				0C3BD9351DC89BC40012C94D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 		0C3BD9401DC89E3E0012C94D /* Build configuration list for PBXNativeTarget "JSON-tvOSTests" */ = {
 			isa = XCConfigurationList;
@@ -733,7 +732,7 @@
 				0C3BD9421DC89E3E0012C94D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 		OBJ_2 /* Build configuration list for PBXProject "JSON" */ = {
 			isa = XCConfigurationList;
@@ -742,7 +741,7 @@
 				OBJ_4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 		OBJ_21 /* Build configuration list for PBXNativeTarget "JSON-macOS" */ = {
 			isa = XCConfigurationList;
@@ -751,7 +750,7 @@
 				OBJ_23 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 		OBJ_31 /* Build configuration list for PBXNativeTarget "JSON-macOSTests" */ = {
 			isa = XCConfigurationList;
@@ -760,7 +759,7 @@
 				OBJ_33 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
