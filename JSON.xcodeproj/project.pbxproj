@@ -17,40 +17,40 @@
 		0C3BD9231DC897610012C94D /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Util.swift */; };
 		0C3BD92F1DC89BC40012C94D /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* ParsingTests.swift */; };
 		0C3BD9301DC89BC40012C94D /* PrintingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* PrintingTests.swift */; };
-		0C3BD9321DC89BC40012C94D /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* JSON.framework */; };
 		0C3BD93C1DC89E3E0012C94D /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* ParsingTests.swift */; };
 		0C3BD93D1DC89E3E0012C94D /* PrintingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* PrintingTests.swift */; };
-		0C3BD93F1DC89E3E0012C94D /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* JSON.framework */; };
-		OBJ_25 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* JSON.swift */; };
-		OBJ_26 /* ParserImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* ParserImpl.swift */; };
-		OBJ_27 /* PrinterImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* PrinterImpl.swift */; };
-		OBJ_28 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Util.swift */; };
-		OBJ_35 /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* ParsingTests.swift */; };
-		OBJ_36 /* PrintingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* PrintingTests.swift */; };
-		OBJ_38 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* JSON.framework */; };
+		0C64B4B51DCA0519006F9928 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* JSON.swift */; };
+		0C64B4B61DCA051B006F9928 /* ParserImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* ParserImpl.swift */; };
+		0C64B4B71DCA051E006F9928 /* PrinterImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* PrinterImpl.swift */; };
+		0C64B4B81DCA0521006F9928 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Util.swift */; };
+		0C64B4B91DCA052B006F9928 /* ParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_15 /* ParsingTests.swift */; };
+		0C64B4BA1DCA052E006F9928 /* PrintingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* PrintingTests.swift */; };
+		0C64B4BB1DCA058E006F9928 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* JSON.framework */; };
+		0C64B4BC1DCA0593006F9928 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C3BD91C1DC897570012C94D /* JSON.framework */; };
+		0C64B4BE1DCA05B9006F9928 /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C3BD9281DC897610012C94D /* JSON.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		0C3BD9111DC897420012C94D /* PBXContainerItemProxy */ = {
+		0C64B4BF1DCA0612006F9928 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_20;
-			remoteInfo = JSON;
+			remoteGlobalIDString = 0C3BD9121DC897570012C94D;
+			remoteInfo = "JSON-iOS";
 		};
-		0C3BD92D1DC89BC40012C94D /* PBXContainerItemProxy */ = {
+		0C64B4C11DCA0618006F9928 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_20;
-			remoteInfo = JSON;
+			remoteGlobalIDString = 0C3BD91E1DC897610012C94D;
+			remoteInfo = "JSON-tvOS";
 		};
-		0C3BD93A1DC89E3E0012C94D /* PBXContainerItemProxy */ = {
+		0C64B4C31DCA0633006F9928 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = OBJ_20;
-			remoteInfo = JSON;
+			remoteInfo = "JSON-macOS";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -89,7 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				0C3BD9321DC89BC40012C94D /* JSON.framework in Frameworks */,
+				0C64B4BC1DCA0593006F9928 /* JSON.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,7 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				0C3BD93F1DC89E3E0012C94D /* JSON.framework in Frameworks */,
+				0C64B4BE1DCA05B9006F9928 /* JSON.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,7 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_38 /* JSON.framework in Frameworks */,
+				0C64B4BB1DCA058E006F9928 /* JSON.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,7 +225,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				0C3BD92C1DC89BC40012C94D /* PBXTargetDependency */,
+				0C64B4C01DCA0612006F9928 /* PBXTargetDependency */,
 			);
 			name = "JSON-iOSTests";
 			productName = JSONTests;
@@ -242,7 +242,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				0C3BD9391DC89E3E0012C94D /* PBXTargetDependency */,
+				0C64B4C21DCA0618006F9928 /* PBXTargetDependency */,
 			);
 			name = "JSON-tvOSTests";
 			productName = JSONTests;
@@ -275,7 +275,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_39 /* PBXTargetDependency */,
+				0C64B4C41DCA0633006F9928 /* PBXTargetDependency */,
 			);
 			name = "JSON-macOSTests";
 			productName = JSONTests;
@@ -369,10 +369,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_25 /* JSON.swift in Sources */,
-				OBJ_26 /* ParserImpl.swift in Sources */,
-				OBJ_27 /* PrinterImpl.swift in Sources */,
-				OBJ_28 /* Util.swift in Sources */,
+				0C64B4B61DCA051B006F9928 /* ParserImpl.swift in Sources */,
+				0C64B4B71DCA051E006F9928 /* PrinterImpl.swift in Sources */,
+				0C64B4B51DCA0519006F9928 /* JSON.swift in Sources */,
+				0C64B4B81DCA0521006F9928 /* Util.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,28 +380,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_35 /* ParsingTests.swift in Sources */,
-				OBJ_36 /* PrintingTests.swift in Sources */,
+				0C64B4BA1DCA052E006F9928 /* PrintingTests.swift in Sources */,
+				0C64B4B91DCA052B006F9928 /* ParsingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		0C3BD92C1DC89BC40012C94D /* PBXTargetDependency */ = {
+		0C64B4C01DCA0612006F9928 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_20 /* JSON-macOS */;
-			targetProxy = 0C3BD92D1DC89BC40012C94D /* PBXContainerItemProxy */;
+			target = 0C3BD9121DC897570012C94D /* JSON-iOS */;
+			targetProxy = 0C64B4BF1DCA0612006F9928 /* PBXContainerItemProxy */;
 		};
-		0C3BD9391DC89E3E0012C94D /* PBXTargetDependency */ = {
+		0C64B4C21DCA0618006F9928 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_20 /* JSON-macOS */;
-			targetProxy = 0C3BD93A1DC89E3E0012C94D /* PBXContainerItemProxy */;
+			target = 0C3BD91E1DC897610012C94D /* JSON-tvOS */;
+			targetProxy = 0C64B4C11DCA0618006F9928 /* PBXContainerItemProxy */;
 		};
-		OBJ_39 /* PBXTargetDependency */ = {
+		0C64B4C41DCA0633006F9928 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = OBJ_20 /* JSON-macOS */;
-			targetProxy = 0C3BD9111DC897420012C94D /* PBXContainerItemProxy */;
+			targetProxy = 0C64B4C31DCA0633006F9928 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
