@@ -8,33 +8,33 @@ func data(_ str: String) -> Data {
 
 /// Helper function that assert given two objects are approximately equals.
 func JSONTestAssertValueEqual(_ val1: Any, _ val2: Any) {
-  switch (val1, val2) {
-    case let (d1, d2) as ([String: Any], [String: Any]):
+    switch (val1, val2) {
+    case let (d1 as [String: Any], d2 as [String: Any]):
         XCTAssertEqual(d1.count, d2.count)
         for k in d1.keys {
-          XCTAssertNotNil(d1[k])
-          XCTAssertNotNil(d2[k])
-          JSONTestAssertValueEqual(d1[k]!, d2[k]!)
+            XCTAssertNotNil(d1[k])
+            XCTAssertNotNil(d2[k])
+            JSONTestAssertValueEqual(d1[k]!, d2[k]!)
         }
-    case let (a1, a2) as ([Any], [Any]):
+    case let (a1 as [Any], a2 as [Any]):
         XCTAssertEqual(a1.count, a2.count)
         for i in 0 ..< a1.count {
-          JSONTestAssertValueEqual(a1[i], a2[i])
+            JSONTestAssertValueEqual(a1[i], a2[i])
         }
-    case let (s1, s2) as (String, String):
+    case let (s1 as String, s2 as String):
         XCTAssertEqual(s1, s2)
-    case let (i1, i2) as (Int, Int):
+    case let (i1 as Int, i2 as Int):
         XCTAssertEqual(i1, i2)
-    case let (f1, f2) as (Double, Double):
+    case let (f1 as Double, f2 as Double):
         // decode -> encode -> decode may result different value.
         XCTAssertEqual("\(f1)", "\(f2)")
-    case let (b1, b2) as (Bool, Bool):
+    case let (b1 as Bool, b2 as Bool):
         XCTAssertEqual(b1, b2)
-    case is (NSNull, NSNull):
+    case (is NSNull, is NSNull):
         break
     default:
-        XCTFail("not equal")
-  }
+        XCTFail("Unexpected operand in JSONTestAssertValueEqual: '\(type(of: val1))' and '\(type(of: val2))'")
+    }
 }
 
 class JSONParsingTests: XCTestCase {
