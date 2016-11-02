@@ -112,6 +112,40 @@ class JSONPrintingTests: XCTestCase {
         }
     }
     
+    func testIndent_array() {
+        try XCTAssertEqual(str(JSON.encode([], indentShift: 2)), "[]\n")
+        try XCTAssertEqual(str(JSON.encode([1], indentShift: 2)), "[\n  1\n]\n")
+        try XCTAssertEqual(str(JSON.encode([42, 12], indentShift: 2)), "[\n  42,\n  12\n]\n")
+        try XCTAssertEqual(str(JSON.encode([42, [1,2]], indentShift: 2)), "[\n  42,\n  [\n    1,\n    2\n  ]\n]\n")
+    }
+    
+    func testIndent_object() {
+        try XCTAssertEqual(str(JSON.encode([:], indentShift: 2)), "{}\n")
+
+        let result1 = try! str(JSON.encode(["foo": true, "bar": -1], indentShift: 2))
+        XCTAssertTrue(
+           result1 == "{\n  \"foo\":true,\n  \"bar\":-1\n}\n" ||
+           result1 == "{\n  \"bar\":-1,\n  \"foo\":true\n}\n"
+        )
+        let result2 = try! str(JSON.encode(["foo": true, "bar": ["baz": 1]], indentShift: 2))
+        XCTAssertTrue(
+           result2 == "{\n  \"foo\":true,\n  \"bar\":{\n    \"baz\":1\n  }\n}\n" ||
+           result2 == "{\n  \"bar\":{\n    \"baz\":1\n  },\n  \"foo\":true\n}\n"
+        )
+    }
+
+    func testIndent_mixed() {
+        try XCTAssertEqual(str(JSON.encode([42, ["foo": [1, NSNull()]]], indentShift: 2)),
+                           "[\n  42,\n  {\n    \"foo\":[\n      1,\n      null\n    ]\n  }\n]\n")
+    }
+
+    func testSpatial() {
+        try XCTAssertEqual(str(JSON.encode([42, ["foo": [1, NSNull()]], -12], spatial: true)),
+                           "[42, {\"foo\": [1, null]}, -12]")
+
+        try XCTAssertEqual(str(JSON.encode([42, ["foo": [1, NSNull()]], -12], indentShift: 2, spatial: true)),
+                           "[\n  42,\n  {\n    \"foo\": [\n      1,\n      null\n    ]\n  },\n  -12\n]\n")
+    }
     
     static var allTests : [(String, (JSONPrintingTests) -> () throws -> Void)] {
         return [

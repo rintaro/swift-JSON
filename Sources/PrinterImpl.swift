@@ -215,11 +215,13 @@ struct PrinterImpl<NullType> {
     ///   value
     mutating func visitArray(_ arry: [Any]) throws {
         put(ascii8("["))
-        try withBlock {
-            var first = true
-            for value in arry {
-                putInterleave(&first)
-                try visit(value)
+        if !arry.isEmpty {
+            try withBlock {
+                var first = true
+                for value in arry {
+                    putInterleave(&first)
+                    try visit(value)
+                }
             }
         }
         put(ascii8("]"))
@@ -234,15 +236,17 @@ struct PrinterImpl<NullType> {
     ///   string ':' value
     mutating func visitDictionary(_ dict: [String: Any]) throws {
         put(ascii8("{"))
-        try withBlock {
-            var first = true
-            for (k, value) in dict {
-                putInterleave(&first)
-                try visitString(k)
-                put(ascii8(":"))
-                putSpace()
-                try visit(value)
-            }
+        if !dict.isEmpty {
+          try withBlock {
+              var first = true
+              for (k, value) in dict {
+                  putInterleave(&first)
+                  try visitString(k)
+                  put(ascii8(":"))
+                  putSpace()
+                  try visit(value)
+              }
+          }
         }
         put(ascii8("}"))
     }
