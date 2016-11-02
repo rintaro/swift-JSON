@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://cdn.rawgit.com/rintaro/swift-JSON/master/logo.svg" alt="swift-JSON">
+<img src="https://cdn.rawgit.com/rintaro/swift-JSON/master/Images/logo.svg" alt="swift-JSON">
 </p>
 
 <p align="center">
