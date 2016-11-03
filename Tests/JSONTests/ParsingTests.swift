@@ -75,6 +75,7 @@ class JSONParsingTests: XCTestCase {
     func testString_unicodeEscape() throws {
         try XCTAssertEqual(JSON.decode(data("\"\\u2728\"")) as? String, "✨")
         try XCTAssertEqual(JSON.decode(data("\"\\uD834\\udd1E\"")) as? String, "\u{1D11E}")
+        try XCTAssertEqual(JSON.decode(data("\"ABC\\u0000ABC\"")) as? String, "ABC\u{0}ABC")
     }
 
     func testObject_empty() throws {
