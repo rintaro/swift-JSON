@@ -12,7 +12,7 @@
 # JSON
 
 Yet another Swift JSON encoder/decoder.
-Intended to be fast and [RFC7159](https://tools.ietf.org/html/rfc7159) compliant.
+Intended to be [RFC7159](https://tools.ietf.org/html/rfc7159) compliant.
 
 ## Getting Started
 
