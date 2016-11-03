@@ -289,10 +289,6 @@ private struct Lexer {
 }
 
 extension Lexer {
-    enum GetValueAbort : Error {
-        case dummy
-        init() { self = .dummy }
-    }
 
     /// Iterator for escaped characters.
     /// Stops when next character is not '\'.
@@ -375,7 +371,7 @@ extension Lexer {
                 return nil
             }
             let result = UTF8.CodeUnit(ptr.pointee)
-            if 0x00..<0x20 ~= result {
+            if result < 0x20 {
                 hasError = true;
                 return nil
             }
@@ -385,45 +381,62 @@ extension Lexer {
     }
 
     /// Get string value of the string literal token.
-    static func getStringValue(_ range: Token.Range) throws -> String {
+    static func getStringValue(_ range: Token.Range) -> String? {
         var ptr = range.lowerBound + 1
         let end = range.upperBound - 1
+        let byteLength = end - ptr
         
-        var ret: String = ""
-        ret.reserveCapacity(end - ptr)
-        func appendResult(_ result: UnicodeDecodingResult, _ hasError: Bool) throws -> Bool {
-            if hasError {
-                throw GetValueAbort()
-            }
-            switch result {
-            case .scalarValue(let us):
-                ret.unicodeScalars.append(us)
-                return true
-            case .error:
-                throw GetValueAbort()
-            case .emptyInput:
-                return false
-            }
-        }
+        var ret = String.UnicodeScalarView()
+        ret.reserveCapacity(byteLength)
+        var isASCII = true
 
         while ptr != end {
             if ptr.pointee == ascii8("\\") {
                 var utf16Dec = UTF16()
                 var iter = EscapedCharacterIterator(ptr: ptr, end: end)
-                while try appendResult(utf16Dec.decode(&iter), iter.hasError) { /* noop */ }
+                LOOP: while true {
+                    switch utf16Dec.decode(&iter) {
+                    case .scalarValue(let us):
+                        if us.value >= 0x80 && isASCII {
+                            ret.reserveCapacity(byteLength &* 2)
+                            isASCII = false
+                        }
+                        ret.append(us)
+                    case .error:
+                        ret.append("\u{fffd}")
+                    case .emptyInput:
+                        break LOOP
+                    }
+                }
+                if iter.hasError {
+                    return nil
+                }
                 ptr = iter.ptr
             }
             else {
                 var utf8Dec = UTF8()
                 var iter = NormalCharacterIterator(ptr: ptr, end: end)
-                while try appendResult(utf8Dec.decode(&iter), iter.hasError) { /* noop */ }
+                LOOP: while true {
+                    switch utf8Dec.decode(&iter) {
+                    case .scalarValue(let us):
+                        ret.append(us)
+                    case .error:
+                        // Reject error
+                        return nil
+                    case .emptyInput:
+                        break LOOP
+                    }
+                }
+                if iter.hasError {
+                    return nil
+                }
                 ptr = iter.ptr
             }
         }
-        return ret
+        return String(ret)
     }
-    
-    private static func withMakingCString<T>(_ range: Token.Range, fn: (UnsafePointer<Int8>) -> T) throws -> T {
+
+    private static func withMakingCString<T>(_ range: Token.Range, fn: (UnsafePointer<Int8>) -> T) -> T? {
         let tmpBuf = UnsafeMutablePointer<Int8>.allocate(capacity: range.count &+ 1)
         defer { tmpBuf.deallocate(capacity: range.count &+ 1) }
         range.lowerBound.withMemoryRebound(to: Int8.self, capacity: range.count) {
@@ -434,23 +447,23 @@ extension Lexer {
         errno = 0
         let result = fn(tmpBuf)
         guard errno == 0 || errno == ERANGE else {
-            throw GetValueAbort()
+            return nil
         }
         return result
     }
 
     /// Get real value of the real number literal token.
-    static func getRealValue(_ range: Token.Range) throws -> Double {
+    static func getRealValue(_ range: Token.Range) -> Double? {
         // Use strtod instead of Double.init(_:String) because the latter returns
         // `nil` for out of range values
-        return try withMakingCString(range) { strtod($0, nil) }
+        return withMakingCString(range) { strtod($0, nil) }
     }
 
     /// Get integer value of the integer number literal token.
-    static func getIntegerValue(_ range: Token.Range) throws -> Int {
+    static func getIntegerValue(_ range: Token.Range) -> Int? {
         // Use strtol instead of Double.init(_:String) because the latter returns
         // `nil` for out of range values
-        return try withMakingCString(range) { strtol($0, nil, 10) }
+        return withMakingCString(range) { strtol($0, nil, 10) }
     }
 }
 
@@ -610,13 +623,11 @@ struct ParserImpl<NullType> {
     ///   string-literal
     private mutating func parseString() throws -> Any {
         assert(token.kind == .string)
-        do {
-            let result = try Lexer.getStringValue(token.range)
-            try consumeToken(.string)
-            return result
-        } catch _ as Lexer.GetValueAbort {
+        guard let result = Lexer.getStringValue(token.range) else {
             throw lexer.createError(.invalidString, token.loc)
         }
+        try consumeToken(.string)
+        return result
     }
 
     /// Parse JSON number(real) at the current token.
@@ -625,13 +636,11 @@ struct ParserImpl<NullType> {
     ///   number-literal(real)
     private mutating func parseRealNumber() throws -> Any {
         assert(token.kind == .real)
-        do {
-            let result = try Lexer.getRealValue(token.range)
-            try consumeToken(.real)
-            return result
-        } catch _ as Lexer.GetValueAbort {
+        guard let result = Lexer.getRealValue(token.range) else {
             throw lexer.createError(.invalidNumber, token.loc)
         }
+        try consumeToken(.real)
+        return result
     }
 
     /// Parse JSON number(integer) at the current token.
@@ -640,12 +649,10 @@ struct ParserImpl<NullType> {
     ///   number-literal(integer)
     private mutating func parseIntegerNumber() throws -> Any {
         assert(token.kind == .integer)
-        do {
-            let result = try Lexer.getIntegerValue(token.range)
-            try consumeToken(.integer)
-            return result
-        } catch _ as Lexer.GetValueAbort {
+        guard let result = Lexer.getIntegerValue(token.range) else {
             throw lexer.createError(.invalidNumber, token.loc)
         }
+        try consumeToken(.integer)
+        return result
     }
 }
