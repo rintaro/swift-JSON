@@ -566,7 +566,7 @@ struct ParserImpl<NullType> {
           throw lexer.createError(.maxDepthExceeded, token.loc)
         }
         
-        depth += 1
+        depth = depth &+ 1
         repeat {
             if token.kind != .string {
                 throw lexer.createError(.expectedString, token.loc)
@@ -579,7 +579,7 @@ struct ParserImpl<NullType> {
             
             obj[key] = value
         } while try consumeIf(.comma)
-        depth -= 1
+        depth = depth &- 1
         
         if try !consumeIf(.r_brace) {
             throw lexer.createError(.expectedObjectClose, token.loc)
@@ -605,11 +605,11 @@ struct ParserImpl<NullType> {
           throw lexer.createError(.maxDepthExceeded, token.loc)
         }
         
-        depth += 1
+        depth = depth &+ 1
         repeat {
             try ary.append(parseValue())
         } while try consumeIf(.comma)
-        depth -= 1
+        depth = depth &- 1
         
         if try !consumeIf(.r_square) {
             throw lexer.createError(.expectedArrayClose, token.loc)
