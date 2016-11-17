@@ -113,6 +113,30 @@ class JSONParsingTests: XCTestCase {
         XCTAssertEqual(obj![0] as? String, "Ģ")
         XCTAssertEqual(obj![1] as? String, "😢")
     }
+    
+    func testUTF16() throws {
+        let utf16BE_noBOM = "true".data(using: .utf16BigEndian)!
+        let utf16BE_BOM = Data(bytes: [0xFE, 0xFF]) + utf16BE_noBOM
+        let utf16LE_noBOM = "false".data(using: .utf16LittleEndian)!
+        let utf16LE_BOM = Data(bytes: [0xFF, 0xFE]) + utf16LE_noBOM
+
+        XCTAssertEqual(try JSON.decode(utf16BE_noBOM) as? Bool, true)
+        XCTAssertEqual(try JSON.decode(utf16BE_BOM) as? Bool, true)
+        XCTAssertEqual(try JSON.decode(utf16LE_noBOM) as? Bool, false)
+        XCTAssertEqual(try JSON.decode(utf16LE_BOM) as? Bool, false)
+    }
+
+    func testUTF32() throws {
+        let utf32BE_noBOM = "true".data(using: .utf32BigEndian)!
+        let utf32BE_BOM = Data(bytes: [0x00, 0x00, 0xFE, 0xFF]) + utf32BE_noBOM
+        let utf32LE_noBOM = "false".data(using: .utf32LittleEndian)!
+        let utf32LE_BOM = Data(bytes: [0xFF, 0xFE, 0x00, 0x00]) + utf32LE_noBOM
+        
+        XCTAssertEqual(try JSON.decode(utf32BE_noBOM) as? Bool, true)
+        XCTAssertEqual(try JSON.decode(utf32BE_BOM) as? Bool, true)
+        XCTAssertEqual(try JSON.decode(utf32LE_noBOM) as? Bool, false)
+        XCTAssertEqual(try JSON.decode(utf32LE_BOM) as? Bool, false)
+    }
 
     func testError_keyword() {
         try XCTAssertThrowsError(JSON.decode(data("nan"))) {

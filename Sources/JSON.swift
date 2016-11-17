@@ -90,31 +90,30 @@ private func detectEncoding(
     _ ptr: UnsafePointer<UInt8>, _ count: Int
 ) -> (encoding: String.Encoding, skippedCount: Int) {
     if count >= 4 {
-        switch (ptr[0], ptr[1], ptr[2], ptr[3]) {
+        let char4 = ptr.withMemoryRebound(to: UInt32.self, capacity: 1, { $0.pointee.bigEndian })
+        switch char4 {
         // UTF32 BOM.
-        case (0x00, 0x00, 0xFE, 0xFF): return (.utf32BigEndian, 4)
-        case (0xFF, 0xFE, 0x00, 0x00): return (.utf32LittleEndian, 4)
+        case 0x0000FEFF: return (.utf32BigEndian, 4)
+        case 0xFFFE0000: return (.utf32LittleEndian, 4)
         // UTF32 detection.
-        case (_, 0, 0, 0): return (.utf32BigEndian, 0)
-        case (0, 0, 0, _): return (.utf32LittleEndian, 0)
+        case _ where char4 & ~0x000000FF == 0: return (.utf32BigEndian, 0)
+        case _ where char4 & ~0xFF000000 == 0: return (.utf32LittleEndian, 0)
         default: break
         }
     }
     if count >= 2 {
-        switch (ptr[0], ptr[1]) {
+        let char2 = ptr.withMemoryRebound(to: UInt16.self, capacity: 1, { $0.pointee.bigEndian })
+        if char2 == 0xFEFF { return (.utf16BigEndian, 2) }
+        switch char2 {
         // UTF16 BOM.
-        case (0xFE, 0xFF): return (.utf16BigEndian, 2)
-        case (0xFF, 0xFE): return (.utf16LittleEndian, 2)
+        case 0xFEFF: return (.utf16BigEndian, 2)
+        case 0xFFFE: return (.utf16LittleEndian, 2)
         // UTF16 detection.
-        case (0, _): return (.utf16BigEndian, 0)
-        case (_, 0): return (.utf16LittleEndian, 0)
+        case _ where char2 & ~0x00FF == 0: return (.utf16BigEndian, 0)
+        case _ where char2 & ~0xFF00 == 0: return (.utf16LittleEndian, 0)
         // UTF8 BOM. FIXME: Should we support this?
-        case (0xEF, 0xBB):
-            if count >= 3 && ptr[2] == 0xBF {
-                return (.utf8, 3)
-            }
-        default:
-            break
+        case 0xEFBB where count >= 3 && ptr[2] == 0xBF: return (.utf8, 3)
+        default: break
         }
     }
     return (.utf8, 0)
