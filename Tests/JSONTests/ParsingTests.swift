@@ -285,12 +285,13 @@ class JSONParsingTests: XCTestCase {
         for url in urls where url.pathExtension == "json" {
             let basename = url.lastPathComponent
             let dat = try! Data(contentsOf: url)
-            let obj = try? JSON.decode(dat)
-
-            if let obj = obj {
-              print("JSONTestSuite: accepted \(basename) -> \(type(of:obj))")
-            } else {
-              print("JSONTestSuite: rejected \(basename)")
+            let obj: Any?
+            do {
+                obj = try JSON.decode(dat)
+                print("JSONTestSuite: accepted \(basename) -> \(type(of:obj))")
+            } catch let e {
+                obj = nil
+                print("JSONTestSuite: rejected \(basename): \(e)")
             }
 
             if basename.hasPrefix("y_") {
