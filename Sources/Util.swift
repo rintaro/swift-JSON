@@ -1,4 +1,11 @@
 /// In optimized configuration, statically convert an ASCII character literal to
+/// UTF32 CodeUnit (UInt32)
+func ascii32(_ x: UnicodeScalar) -> UTF32.CodeUnit {
+    return x.value
+}
+
+
+/// In optimized configuration, statically convert an ASCII character literal to
 /// UTF16 CodeUnit (UInt16)
 func ascii16(_ x: UnicodeScalar) -> UTF16.CodeUnit {
     return UTF16.CodeUnit(truncatingBitPattern: x.value)

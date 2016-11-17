@@ -178,18 +178,30 @@ private struct Lexer {
     mutating func lexKeyword() throws -> Token {
         let start = ptr - 1
         if endPtr - ptr >= 3 {
-            switch (ptr[-1], ptr[0], ptr[1], ptr[2]) {
-            case (ascii8("n"), ascii8("u"), ascii8("l"), ascii8("l")): // null
+            let char4 = start.withMemoryRebound(to: UInt32.self, capacity: 1, { $0.pointee.bigEndian })
+            switch char4 {
+            // null
+            case ascii32("n") << 24 |
+                 ascii32("u") << 16 |
+                 ascii32("l") << 8 |
+                 ascii32("l"):
                 ptr += 3
                 return createToken(.null, start)
-            case (ascii8("t"), ascii8("r"), ascii8("u"), ascii8("e")): // true
+            // true
+            case ascii32("t") << 24 |
+                 ascii32("r") << 16 |
+                 ascii32("u") << 8 |
+                 ascii32("e"):
                 ptr += 3
                 return createToken(.true_, start)
-            case (ascii8("f"), ascii8("a"), ascii8("l"), ascii8("s")): // false
-                if endPtr - ptr >= 4 && ptr[3] == ascii8("e"){
-                    ptr += 4
-                    return createToken(.false_, start)
-                }
+            // false
+            case ascii32("f") << 24 |
+                 ascii32("a") << 16 |
+                 ascii32("l") << 8 |
+                 ascii32("s") where
+                 endPtr - ptr >= 4 && ptr[3] == ascii8("e"):
+                ptr += 4
+                return createToken(.false_, start)
             default:
                 break
             }
