@@ -142,12 +142,12 @@ class JSONParsingTests: XCTestCase {
         try XCTAssertThrowsError(JSON.decode(data("nan"))) {
             let err = $0 as? JSONParsingError
             XCTAssertNotNil(err)
-            XCTAssertEqual(err?.kind, .unknownKeyword)
+            XCTAssertEqual(err?.kind, .unknownToken)
         }
         try XCTAssertThrowsError(JSON.decode(data("inf"))) {
             let err = $0 as? JSONParsingError
             XCTAssertNotNil(err)
-            XCTAssertEqual(err?.kind, .unknownKeyword)
+            XCTAssertEqual(err?.kind, .unknownToken)
         }
     }
     
@@ -155,12 +155,12 @@ class JSONParsingTests: XCTestCase {
         try XCTAssertThrowsError(JSON.decode(data("01"))) {
             let err = $0 as? JSONParsingError
             XCTAssertNotNil(err)
-            XCTAssertEqual(err?.kind, .invalidNumber)
+            XCTAssertEqual(err?.kind, .unknownToken)
         }
         try XCTAssertThrowsError(JSON.decode(data("+12"))) {
             let err = $0 as? JSONParsingError
             XCTAssertNotNil(err)
-            XCTAssertEqual(err?.kind, .unexpectedToken)
+            XCTAssertEqual(err?.kind, .unknownToken)
         }
     }
     
@@ -168,7 +168,7 @@ class JSONParsingTests: XCTestCase {
         try XCTAssertThrowsError(JSON.decode(data("\"abc"))) {
             let err = $0 as? JSONParsingError
             XCTAssertNotNil(err)
-            XCTAssertEqual(err!.kind, .unterminatedString)
+            XCTAssertEqual(err!.kind, .unknownToken)
         }
         try XCTAssertThrowsError(JSON.decode(data("[\"\u{00}\"]"))) {
             let err = $0 as? JSONParsingError

@@ -213,7 +213,7 @@ struct PrinterImpl<NullType> {
     ///   array-element-list ',' array-element
     /// array-element:
     ///   value
-    mutating func visitArray(_ arry: [Any]) throws {
+    mutating func visitArray<C: Collection>(_ arry: C) throws {
         put(ascii8("["))
         if !arry.isEmpty {
             try withBlock {
@@ -333,11 +333,14 @@ struct PrinterImpl<NullType> {
     mutating func visit(_ value: Any) throws {
         switch value {
         case let str as String: try visitString(str)
-        case let arry as [Any]: try visitArray(arry)
-        case let obj as [String: Any]: try visitDictionary(obj)
         case let bool as Bool: try visitBool(bool)
         case let null as NullType: try visitNull(null)
-        // integers
+        case let dict as Dictionary<String, Any>: try visitDictionary(dict)
+        // arrays.
+        case let arry as ContiguousArray<Any>: try visitArray(arry)
+        case let arry as ArraySlice<Any>: try visitArray(arry)
+        case let arry as Array<Any>: try visitArray(arry)
+        // integers.
         case let int as Int: try visitInteger(int)
         case let int as Int8: try visitInteger(int)
         case let int as Int16: try visitInteger(int)
@@ -348,7 +351,7 @@ struct PrinterImpl<NullType> {
         case let int as UInt16: try visitInteger(int)
         case let int as UInt32: try visitInteger(int)
         case let int as UInt64: try visitInteger(int)
-        // floating points
+        // floating points.
         case let flt as Float: try visitFloatingPoint(flt)
         case let dbl as Double: try visitFloatingPoint(dbl)
         default:

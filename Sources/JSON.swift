@@ -30,7 +30,7 @@ extension JSON {
         maxDepth: Int = MAX_DEPTH_DEFAULT
     ) throws -> Any {
         return try ensuringUTF8(data) { (ptr: UnsafePointer<UInt8>, count: Int) -> Any in
-            var impl = try ParserImpl(
+            var impl = ParserImpl(
                 start: ptr,
                 end: ptr + count,
                 null: NSNull(),

@@ -65,6 +65,7 @@ private struct Token {
         case integer
         case real
         case eof
+        case unknown
     }
     
     typealias Range = Swift.CountableRange<Pointer>
@@ -131,7 +132,7 @@ private struct Lexer {
     }
 
     /// Tokenize next token and return it.
-    mutating func lexImpl() throws -> Token {
+    mutating func lexImpl() -> Token {
         var start = ptr
         repeat {
             if ptr == endPtr {
@@ -147,7 +148,7 @@ private struct Lexer {
                 start += 1
                 continue
             case ascii8("\""): // quotation mark
-                return try lexString()
+                return lexString()
             case ascii8("{"): // left curly bracket
                 return createToken(.l_brace, start)
             case ascii8("}"): // right curly bracket
@@ -162,12 +163,12 @@ private struct Lexer {
                 return createToken(.r_square, start)
             case ascii8("0")...ascii8("9"), // 0...9
             ascii8("-"): // minus
-                return try lexNumber()
+                return lexNumber()
             case ascii8("a")...ascii8("z"), // a-z
             ascii8("A")...ascii8("Z"): // A-Z
-                return try lexKeyword()
+                return lexKeyword()
             default:
-                throw createError(.unexpectedToken, start)
+                return createToken(.unknown, start)
             }
         } while ptr != endPtr
         
@@ -175,7 +176,7 @@ private struct Lexer {
     }
 
     /// Tokenize a keyword.
-    mutating func lexKeyword() throws -> Token {
+    mutating func lexKeyword() -> Token {
         let start = ptr - 1
         if endPtr - ptr >= 3 {
             let char4 = start.withMemoryRebound(to: UInt32.self, capacity: 1, { $0.pointee.bigEndian })
@@ -207,11 +208,11 @@ private struct Lexer {
             }
         }
         
-        throw createError(.unknownKeyword, start)
+        return createToken(.unknown, start)
     }
 
     /// Tokenize a string literal.
-    mutating func lexString() throws -> Token {
+    mutating func lexString() -> Token {
         let start = ptr - 1
         while ptr != endPtr {
             // Find '"'.
@@ -230,11 +231,11 @@ private struct Lexer {
             }
             ptr += 1
         }
-        throw createError(.unterminatedString, start)
+        return createToken(.unknown, start)
     }
 
     /// Tokenize a number literal.
-    mutating func lexNumber() throws -> Token {
+    mutating func lexNumber() -> Token {
         let start = ptr-1
         let digit = ascii8("0")...ascii8("9")
 
@@ -252,7 +253,7 @@ private struct Lexer {
             // '-0' DIGIT*N;
             ptr - start > 2 && start.pointee == ascii8("-") && (start+1).pointee == ascii8("0") 
         ) {
-            throw createError(.invalidNumber, start)
+            return createToken(.unknown, start)
         }
         
         // Eat fraction part....
@@ -264,7 +265,7 @@ private struct Lexer {
             }
             if ptr == ptrAfterDot {
                 // Fraction without following digits.
-                throw createError(.invalidNumber, start)
+                return createToken(.unknown, start)
             }
             isInteger = false
         }
@@ -273,7 +274,7 @@ private struct Lexer {
         if ptr.pointee == ascii8("e") || ptr.pointee == ascii8("E") {
             ptr += 1
             if ptr == endPtr {
-                throw createError(.invalidNumber, start)
+                return createToken(.unknown, start)
             }
             
             // Eat '+' or '-'
@@ -287,7 +288,7 @@ private struct Lexer {
             }
             if ptr == ptrAfterExp {
                 // Exponent without following digits.
-                throw createError(.invalidNumber, start)
+                return createToken(.unknown, start)
             }
             isInteger = false
         }
@@ -487,12 +488,12 @@ struct ParserImpl<NullType> {
     private var depth: Int
     private var token: Token
     
-    init(start: Pointer, end: Pointer, null: NullType, maxDepth: Int) throws {
+    init(start: Pointer, end: Pointer, null: NullType, maxDepth: Int) {
         self.maxDepth = maxDepth
         self.nullValue = null
         self.lexer = Lexer(start: start, end: end)
         self.depth = 0
-        self.token = try lexer.lexImpl()
+        self.token = lexer.lexImpl()
     }
 
     /// Parse JSON number(integer) at the current token.
@@ -506,19 +507,19 @@ struct ParserImpl<NullType> {
 
     /// Consume current token.
     /// Asserts the currentToken is the given kind.
-    private mutating func consumeToken(_ kind: Token.Kind) throws {
+    private mutating func consumeToken(_ kind: Token.Kind) {
         assert(token.kind == kind)
-        token = try lexer.lexImpl()
+        token = lexer.lexImpl()
     }
 
     /// Consume current token only if it is a given token kind.
     ///
     /// Returns: true if consumed, false otherwise
-    private mutating func consumeIf(_ kind: Token.Kind) throws -> Bool {
+    private mutating func consumeIf(_ kind: Token.Kind) -> Bool {
         if token.kind != kind {
             return false
         }
-        token = try lexer.lexImpl()
+        token = lexer.lexImpl()
         return true;
     }
 
@@ -540,10 +541,10 @@ struct ParserImpl<NullType> {
         case .l_square:
             return try parseArray()
         case .true_:
-            try consumeToken(.true_)
+            consumeToken(.true_)
             return true
         case .false_:
-            try consumeToken(.false_)
+            consumeToken(.false_)
             return false
         case .string:
             return try parseString()
@@ -552,12 +553,14 @@ struct ParserImpl<NullType> {
         case .real:
             return try parseRealNumber()
         case .null:
-            try consumeToken(.null)
+            consumeToken(.null)
             return nullValue
         case .eof:
             throw lexer.createError(.expectedValue, token.loc)
         case .comma, .colon, .r_brace, .r_square:
             throw lexer.createError(.unexpectedToken, token.loc)
+        case .unknown:
+            throw lexer.createError(.unknownToken, token.loc)
         }
     }
 
@@ -566,11 +569,11 @@ struct ParserImpl<NullType> {
     /// object:
     ///   '{' (string ':' value)* '}'
     private mutating func parseObject() throws -> Any {
-        try consumeToken(.l_brace)
+        consumeToken(.l_brace)
 
         var obj: [String: Any] = [:]
         
-        if try consumeIf(.r_brace) {
+        if consumeIf(.r_brace) {
             return obj
         }
         
@@ -584,16 +587,16 @@ struct ParserImpl<NullType> {
                 throw lexer.createError(.expectedString, token.loc)
             }
             let key = try parseString() as! String;
-            if try !consumeIf(.colon) {
+            if !consumeIf(.colon) {
                 throw lexer.createError(.expectedColon, token.loc)
             }
             let value = try parseValue()
             
             obj[key] = value
-        } while try consumeIf(.comma)
+        } while consumeIf(.comma)
         depth = depth &- 1
         
-        if try !consumeIf(.r_brace) {
+        if !consumeIf(.r_brace) {
             throw lexer.createError(.expectedObjectClose, token.loc)
         }
         return obj
@@ -604,12 +607,12 @@ struct ParserImpl<NullType> {
     /// object:
     ///   '[' (value)* ']'
     private mutating func parseArray() throws -> Any {
-        try consumeToken(.l_square)
+        consumeToken(.l_square)
         
         var ary: [Any] = []
         
         // Short circuit
-        if try consumeIf(.r_square) {
+        if consumeIf(.r_square) {
             return ary
         }
 
@@ -620,10 +623,10 @@ struct ParserImpl<NullType> {
         depth = depth &+ 1
         repeat {
             try ary.append(parseValue())
-        } while try consumeIf(.comma)
+        } while consumeIf(.comma)
         depth = depth &- 1
         
-        if try !consumeIf(.r_square) {
+        if !consumeIf(.r_square) {
             throw lexer.createError(.expectedArrayClose, token.loc)
         }
         return ary
@@ -638,7 +641,7 @@ struct ParserImpl<NullType> {
         guard let result = Lexer.getStringValue(token.range) else {
             throw lexer.createError(.invalidString, token.loc)
         }
-        try consumeToken(.string)
+        consumeToken(.string)
         return result
     }
 
@@ -651,7 +654,7 @@ struct ParserImpl<NullType> {
         guard let result = Lexer.getRealValue(token.range) else {
             throw lexer.createError(.invalidNumber, token.loc)
         }
-        try consumeToken(.real)
+        consumeToken(.real)
         return result
     }
 
@@ -664,7 +667,7 @@ struct ParserImpl<NullType> {
         guard let result = Lexer.getIntegerValue(token.range) else {
             throw lexer.createError(.invalidNumber, token.loc)
         }
-        try consumeToken(.integer)
+        consumeToken(.integer)
         return result
     }
 }
