@@ -345,26 +345,24 @@ extension Lexer {
                 return nil
             }
             
-            let digit = ascii16("0")...ascii16("9")
-            let lower = ascii16("a")...ascii16("f")
-            let upper = ascii16("A")...ascii16("F")
-            
-            var result: UTF16.CodeUnit = 0
-            let term = ptr + 4
-            while ptr != term {
-                var c = UTF16.CodeUnit(ptr.pointee)
+            func fromHex(c: UTF16.CodeUnit) -> UTF16.CodeUnit {
                 switch c {
-                case digit: c = c &- digit.lowerBound
-                case lower: c = c &- lower.lowerBound &+ 10
-                case upper: c = c &- upper.lowerBound &+ 10
+                case ascii16("0")...ascii16("9"): return c &- ascii16("0")
+                case ascii16("a")...ascii16("f"): return c &- ascii16("a") &+ 10
+                case ascii16("A")...ascii16("F"): return c &- ascii16("A") &+ 10
                 default:
-                    hasError = true;
-                    return nil
+                    hasError = true
+                    return 0
                 }
-                result = (result << 4) &+ c
-                ptr += 1
             }
-            return result;
+            
+            let result =
+                fromHex(c: UTF16.CodeUnit(ptr[0])) << 12 |
+                fromHex(c: UTF16.CodeUnit(ptr[1])) << 8 |
+                fromHex(c: UTF16.CodeUnit(ptr[2])) << 4 |
+                fromHex(c: UTF16.CodeUnit(ptr[3]))
+            ptr += 4
+            return result
         }
     }
 
